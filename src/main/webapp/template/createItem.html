@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建商品</title>
+    <script src="../static/javascript/jquery-2.2.4.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/login.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/components.css">
+</head>
+<body class="login">
+    <div class="content">
+    <h3 class="form-title">创建商品</h3>
+    <div>
+        <label class="control-label">商品名</label>
+        <div class="form-group">
+            <input class="form-control" type="text" placeholder="商品名" name="title" id="title"/>
+        </div>
+        <label class="control-label">商品描述</label>
+        <div>
+            <input class="form-control" type="text" placeholder="商品描述" name="description" id="description"/>
+        </div>
+        <label class="control-label">价格</label>
+        <div class="control-label">
+            <input class="form-control" type="text" placeholder="价格" name="price" id="price"/>
+        </div>
+        <label>商品图片</label>
+        <div class="control-label">
+            <input class="form-control" type="text" placeholder="商品图片" name="imgUrl" id="imgUrl"/>
+        </div>
+        <label class="control-label">商品库存</label>
+        <div>
+            <input class="form-control" type="text" placeholder="商品库存" name="stock" id="stock"/>
+        </div>
+        <div class="form-actions">
+        <button class="btn blue" id="create" type="submit">
+            提交创建
+        </button>
+        </div>
+    </div>
+    </div>
+</body>
+<script>
+    $(document).ready(function () {
+        $("#create").on("click",function () {
+            $.ajax({
+                type:"POST",
+                url:"http://112.126.100.195:8080/item/create",
+                xhrFields:{withCredentials:true},
+                data:{
+                    "title":$("#title").val(),
+                    "description":$("#description").val(),
+                    "imgUrl":$("#imgUrl").val(),
+                    "price":$("#price").val(),
+                    "stock":$("#stock").val()
+                },
+                success:function (data) {
+                    if(data.status=="success"){
+                        alert("成功")
+                    }else {
+                        alert("创建失败,原因为"+data.data.errMsg)
+                    }
+                },
+                errror:function (data) {
+                    alert("创建失败,原因为"+data.responseText)
+                }
+            });
+            return false;
+        });
+    })
+</script>
+</html>
