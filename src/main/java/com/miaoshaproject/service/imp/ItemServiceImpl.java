@@ -12,6 +12,7 @@ import com.miaoshaproject.service.PromoService;
 import com.miaoshaproject.service.model.ItemModel;
 import com.miaoshaproject.service.model.PromoModel;
 import com.miaoshaproject.validate.ValidatorImpl;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -41,6 +42,9 @@ public class  ItemServiceImpl implements ItemService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @Override
     @Transactional
     public ItemModel createItem(ItemModel itemModel) throws BusinessException {
@@ -63,7 +67,11 @@ public class  ItemServiceImpl implements ItemService {
     //删除缓存
     @Override
     public void deleteItemCache(int id){
-        redisTemplate.delete("item_validate_"+id);
+        boolean result=redisTemplate.delete("item_validate_"+id);
+        //假设删除缓存失败，使用消息队列重试删除缓存
+        if(!result){
+            rabbitTemplate.convertAndSend("delCache",id);
+        }
     }
 
     private Item convertFromItemModel(ItemModel itemModel){
