@@ -15,6 +15,8 @@ import com.miaoshaproject.service.model.OrderModel;
 import com.miaoshaproject.service.model.PromoModel;
 import com.miaoshaproject.service.model.UserModel;
 import org.joda.time.DateTime;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -43,6 +47,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired(required = false)
     private SequenceMapper sequenceMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Override
+    public void createOrderWithMQ(Integer userId, Integer itemId, Integer amount){
+        OrderModel orderModel=new OrderModel();
+        orderModel.setAmount(amount);
+        orderModel.setItemId(itemId);
+        orderModel.setUserId(userId);
+        rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
+        rabbitTemplate.convertAndSend("orderQueue",orderModel);
+    }
 
     @Override
     //默认数据库默认的隔离级别，传播行为默认Propagation.REQUIRED

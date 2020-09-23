@@ -1,8 +1,9 @@
 package com.miaoshaproject.service.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class OrderModel {
+public class OrderModel implements Serializable {
     //2018102100012828
     private String id;
     private Integer userId;
@@ -10,6 +11,9 @@ public class OrderModel {
     private Integer amount;
     private BigDecimal itemPrice;
     private BigDecimal orderPrice;
+
+    public OrderModel() {
+    }
 
     public BigDecimal getItemPrice() {
         return itemPrice;
